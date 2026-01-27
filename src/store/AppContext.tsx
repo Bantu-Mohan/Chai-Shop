@@ -293,7 +293,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         };
     }, []);
 
-    // 2. Sync Local Changes to Supabase
+    // 2. Sync Local Changes to Supabase (Debounced)
+    const persistTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
     useEffect(() => {
         if (isRemoteUpdate.current) {
             // Update came from DB, so don't echo it back
@@ -301,27 +303,37 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             return;
         }
 
+        const changesToSync: string[] = [];
         Object.keys(state.tables).forEach(key => {
-            const current = state.tables[key];
-            const prev = previousTables.current[key];
-
-            if (!isEqual(current, prev)) {
-                // Table changed, push to Supabase
-                console.log(`Pushing update for table ${key}`);
-                supabase.from('tables').upsert({
-                    id: key,
-                    status: current.status,
-                    items: current.items,
-                    amount: current.amount,
-                    notes: current.notes,
-                    last_paid: current.lastPaid,
-                    paid_orders: current.paidOrders,
-                    started_at: current.startedAt
-                }).then(({ error }) => {
-                    if (error) console.error('Supabase update failed:', error);
-                });
+            if (!isEqual(state.tables[key], previousTables.current[key])) {
+                changesToSync.push(key);
             }
         });
+
+        if (changesToSync.length > 0) {
+            // Cancel previous pending sync
+            if (persistTimer.current) clearTimeout(persistTimer.current);
+
+            // Debounce: Wait 500ms after last change before sending to DB
+            persistTimer.current = setTimeout(() => {
+                changesToSync.forEach(key => {
+                    const current = state.tables[key];
+                    console.log(`Pushing update for table ${key} (Debounced)`);
+                    supabase.from('tables').upsert({
+                        id: key,
+                        status: current.status,
+                        items: current.items,
+                        amount: current.amount,
+                        notes: current.notes,
+                        last_paid: current.lastPaid,
+                        paid_orders: current.paidOrders,
+                        started_at: current.startedAt
+                    }).then(({ error }) => {
+                        if (error) console.error('Supabase update failed:', error);
+                    });
+                });
+            }, 500);
+        }
 
         previousTables.current = state.tables;
     }, [state.tables]);

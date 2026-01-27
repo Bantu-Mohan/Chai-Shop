@@ -5,6 +5,9 @@ import TableGrid from './components/TableGrid/TableGrid';
 import OrderModal from './components/OrderModal/OrderModal';
 import Notifications from './components/Notifications/Notifications';
 import CustomerView from './components/CustomerView/CustomerView';
+import Login from './components/Login/Login';
+import { supabase } from './lib/supabase';
+import type { Session } from '@supabase/supabase-js';
 
 // Sound effect hook
 const NotificationSound = () => {
@@ -13,25 +16,16 @@ const NotificationSound = () => {
 
   useEffect(() => {
     Object.keys(state.tables).forEach(key => {
+      // ... same logic ...
       const current = state.tables[key];
       const prev = previousTables.current[key];
 
-      // Detect switch to ORDERED
-      // We check for:
-      // 1. Status changed to ORDERED
-      // 2. OR Status is ORDERED and items length changed (customer added more items?) - requirements say "Until CASH confirmed, no further orders". 
-      //    So strictly, we just care about the initial transition to ORDERED.
       if (current.status === 'ORDERED' && (!prev || prev.status !== 'ORDERED')) {
-        // Play Sound
         const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3');
         audio.play().catch(e => console.log("Audio play failed", e));
-
-        // Show Notification
         dispatch({ type: 'ADD_NOTIFICATION', payload: `Table ${key} has placed an order!` });
       }
     });
-
-    // Update ref
     previousTables.current = state.tables;
   }, [state.tables, dispatch]);
 
@@ -40,15 +34,43 @@ const NotificationSound = () => {
 
 const MainContent: React.FC = () => {
   const [tableId, setTableId] = useState<string | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Check URL for table param
     const params = new URLSearchParams(window.location.search);
     const tid = params.get('table');
     if (tid) setTableId(tid);
+
+    // Initial Session Check
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
+  if (loading) {
+    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontSize: '1.2rem', color: '#666' }}>Loading...</div>;
+  }
+
+  // PUBLIC ROUTE: Customer View
   if (tableId) {
     return <CustomerView tableId={tableId} />;
+  }
+
+  // PROTECTED ROUTE: Staff Dashboard
+  if (!session) {
+    return <Login />;
   }
 
   return (
@@ -62,6 +84,8 @@ const MainContent: React.FC = () => {
     </>
   );
 };
+
+
 
 const App: React.FC = () => {
   return (
