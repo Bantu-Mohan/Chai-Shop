@@ -437,3 +437,361 @@
     border-color: var(--text-main);
     color: var(--text-main);
 }
+
+/* ============================================
+   Mobile Optimization - OrderModal
+   ============================================ */
+
+@media (max-width: 768px) {
+    .modal {
+        width: 100%;
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+
+    .header {
+        padding: 12px 14px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .header h2 {
+        font-size: 1.1rem;
+    }
+
+    .closeBtn {
+        font-size: 1.6rem;
+    }
+
+    .historyBtn {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+    }
+
+    /* Stack content vertically on mobile */
+    .content {
+        flex-direction: column;
+    }
+
+    .menuSection {
+        flex: none;
+        max-height: 45vh;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 12px;
+    }
+
+    .menuSection h3 {
+        font-size: 0.8rem;
+        margin-bottom: 10px;
+    }
+
+    .menuGrid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .menuItem {
+        height: 70px;
+        padding: 8px;
+        border-radius: 10px;
+    }
+
+    .itemName {
+        font-size: 0.7rem;
+        line-height: 1.2;
+    }
+
+    .itemPrice {
+        font-size: 0.75rem;
+    }
+
+    .orderSection {
+        flex: 1;
+        padding: 12px;
+        overflow-y: auto;
+    }
+
+    .orderSection h3 {
+        font-size: 0.8rem;
+        margin-bottom: 10px;
+    }
+
+    .orderList {
+        margin-bottom: 10px;
+    }
+
+    .orderItem {
+        padding: 8px 0;
+    }
+
+    .orderName {
+        font-size: 0.85rem;
+    }
+
+    .orderPrice {
+        font-size: 0.75rem;
+    }
+
+    .controls button {
+        width: 28px;
+        height: 28px;
+    }
+
+    .controls span {
+        width: 20px;
+        font-size: 0.85rem;
+    }
+
+    .summary {
+        padding-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    .totalRow {
+        font-size: 1.1rem;
+    }
+
+    /* Manual Entry - Compact for mobile */
+    .manualEntry {
+        margin-top: 10px;
+        padding-top: 10px;
+        gap: 6px;
+    }
+
+    .manualInput {
+        font-size: 0.8rem;
+        padding: 8px;
+    }
+
+    .manualPrice {
+        font-size: 0.8rem;
+        padding: 8px;
+        min-width: 50px;
+    }
+
+    .manualAddBtn {
+        width: 36px;
+        min-width: 36px;
+        font-size: 1.1rem;
+    }
+
+    .confirmOrderBtn {
+        padding: 12px;
+        font-size: 0.9rem;
+        margin-top: 10px;
+    }
+
+    .actions {
+        gap: 10px;
+    }
+
+    .statusActions {
+        gap: 6px;
+    }
+
+    .statusActions button {
+        padding: 10px 8px;
+        font-size: 0.8rem;
+    }
+
+    .clearBtn {
+        padding: 10px;
+        font-size: 0.85rem;
+    }
+
+    /* Confirm Content Mobile */
+    .confirmContent {
+        padding: 16px;
+    }
+
+    .confirmList {
+        padding: 12px;
+        max-height: 50vh;
+    }
+
+    .confirmItem {
+        font-size: 0.9rem;
+        padding: 8px 0;
+    }
+
+    .confirmTotal {
+        font-size: 1.2rem;
+        padding: 12px;
+    }
+
+    .confirmActions {
+        gap: 10px;
+        flex-direction: column;
+    }
+
+    .confirmBtn,
+    .cancelBtn {
+        padding: 14px;
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        padding: 10px 12px;
+    }
+
+    .header h2 {
+        font-size: 0.95rem;
+    }
+
+    .closeBtn {
+        font-size: 1.4rem;
+    }
+
+    .menuSection {
+        max-height: 40vh;
+        padding: 10px;
+    }
+
+    .menuGrid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+    }
+
+    .menuItem {
+        height: 60px;
+        padding: 6px;
+        border-radius: 8px;
+    }
+
+    .itemName {
+        font-size: 0.65rem;
+    }
+
+    .itemPrice {
+        font-size: 0.7rem;
+    }
+
+    .orderSection {
+        padding: 10px;
+    }
+
+    .orderName {
+        font-size: 0.8rem;
+    }
+
+    .orderPrice {
+        font-size: 0.7rem;
+    }
+
+    .controls button {
+        width: 26px;
+        height: 26px;
+    }
+
+    .totalRow {
+        font-size: 1rem;
+    }
+
+    .manualEntry {
+        flex-wrap: wrap;
+    }
+
+    .manualInput {
+        flex: 1 1 60%;
+        font-size: 0.75rem;
+        padding: 7px;
+    }
+
+    .manualPrice {
+        flex: 1 1 25%;
+        font-size: 0.75rem;
+        padding: 7px;
+        min-width: 45px;
+    }
+
+    .manualAddBtn {
+        width: 32px;
+        min-width: 32px;
+    }
+
+    .statusActions button {
+        padding: 8px 6px;
+        font-size: 0.7rem;
+    }
+
+    .clearBtn {
+        padding: 8px;
+        font-size: 0.8rem;
+    }
+
+    .confirmOrderBtn {
+        padding: 10px;
+        font-size: 0.85rem;
+    }
+}
+
+/* Extra Small Screens */
+@media (max-width: 360px) {
+    .menuGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .menuItem {
+        height: 55px;
+    }
+
+    .itemName {
+        font-size: 0.6rem;
+    }
+
+    .statusActions button {
+        padding: 6px 4px;
+        font-size: 0.65rem;
+    }
+}
+
+/* Light Theme Adjustments */
+[data-theme="light"] .overlay {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="light"] .modal {
+    background-color: #ffffff;
+}
+
+[data-theme="light"] .header {
+    background-color: #f8fafc;
+    border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .menuSection {
+    border-right-color: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .menuItem {
+    background-color: #f1f5f9;
+}
+
+[data-theme="light"] .menuItem:hover {
+    background-color: rgba(5, 150, 105, 0.1);
+}
+
+[data-theme="light"] .orderSection {
+    background-color: #f8fafc;
+}
+
+[data-theme="light"] .manualInput,
+[data-theme="light"] .manualPrice {
+    background-color: #ffffff;
+    border-color: rgba(0, 0, 0, 0.15);
+    color: #1e293b;
+}
+
+[data-theme="light"] .controls {
+    background-color: #e2e8f0;
+}
+
+[data-theme="light"] .statusActions button {
+    background-color: #f1f5f9;
+    border-color: rgba(0, 0, 0, 0.1);
+    color: #64748b;
+}
