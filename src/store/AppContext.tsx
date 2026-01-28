@@ -2,6 +2,10 @@ import React, { createContext, useContext, useReducer, useEffect, useRef } from 
 import type { AppState, Action, Table } from '../types';
 import { supabase } from '../lib/supabase';
 
+// Session timeout configuration (5 minutes = 300000ms)
+const SESSION_TIMEOUT_MS = 5 * 60 * 1000;
+const LAST_ACTIVITY_KEY = 'chai-shop-last-activity';
+
 // Helper to deep compare tables for sync
 const isEqual = (a: any, b: any) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -290,6 +294,69 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
         return () => {
             supabase.removeChannel(channel);
+        };
+    }, []);
+
+    // Session Timeout: Auto-logout after 5 minutes of tab being closed
+    useEffect(() => {
+        // Check on mount if we should clear session (tab was closed > 5 min ago)
+        const checkSessionTimeout = () => {
+            const lastActivity = localStorage.getItem(LAST_ACTIVITY_KEY);
+            if (lastActivity) {
+                const elapsed = Date.now() - parseInt(lastActivity, 10);
+                if (elapsed > SESSION_TIMEOUT_MS) {
+                    console.log('Session expired - clearing local cart data');
+                    // Clear theme preference to reset
+                    localStorage.removeItem('chai-shop-theme');
+                    // Notify user (optional)
+                    dispatch({ type: 'ADD_NOTIFICATION', payload: 'Session expired. Please refresh to continue.' });
+                }
+            }
+        };
+
+        checkSessionTimeout();
+
+        // Update last activity timestamp when tab becomes hidden
+        const handleVisibilityChange = () => {
+            if (document.hidden) {
+                // Tab is being hidden/closed - record timestamp
+                localStorage.setItem(LAST_ACTIVITY_KEY, Date.now().toString());
+            } else {
+                // Tab is visible again - check if session expired
+                checkSessionTimeout();
+                // Update timestamp since user is active
+                localStorage.setItem(LAST_ACTIVITY_KEY, Date.now().toString());
+            }
+        };
+
+        // Update activity on any user interaction
+        const handleActivity = () => {
+            localStorage.setItem(LAST_ACTIVITY_KEY, Date.now().toString());
+        };
+
+        // Listen for visibility changes
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        // Listen for user activity (debounced via passive)
+        document.addEventListener('click', handleActivity, { passive: true });
+        document.addEventListener('touchstart', handleActivity, { passive: true });
+        document.addEventListener('keydown', handleActivity, { passive: true });
+
+        // Set initial activity timestamp
+        localStorage.setItem(LAST_ACTIVITY_KEY, Date.now().toString());
+
+        // Also save on beforeunload
+        const handleBeforeUnload = () => {
+            localStorage.setItem(LAST_ACTIVITY_KEY, Date.now().toString());
+        };
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            document.removeEventListener('click', handleActivity);
+            document.removeEventListener('touchstart', handleActivity);
+            document.removeEventListener('keydown', handleActivity);
+            window.removeEventListener('beforeunload', handleBeforeUnload);
         };
     }, []);
 
